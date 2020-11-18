@@ -27,7 +27,7 @@ func (e Error) Error() string {
 }
 
 var Settings = SDKSettings{
-	URL:       getEnv("STACKROCK_URL", "https://stackrock.io"),
+	URL:       getEnv("STACKROCK_URL", "https://api.stackrock.io"),
 	userAgent: "Stackrock/1.0.0 [Go]",
 }
 
