@@ -14,7 +14,7 @@ var _ = Describe("tracer", func() {
 	 *  1) To keep the SDK in sync with API
 	 *  2) To Test our API is running as expected
 	 */
-	var _ = Describe("tracer - thumbnail", func() {
+	It("tracer - thumbnail", func() {
 		var STACKROCK_API_KEY = os.Getenv("STACKROCK_API_KEY")
 		var BUCKET = os.Getenv("BUCKET")
 		var INPUT_KEY = os.Getenv("INPUT_KEY")
@@ -28,18 +28,23 @@ var _ = Describe("tracer", func() {
 
 		job, err := NewThumbnailJobWithDefaults().ApiKey(STACKROCK_API_KEY).From(inputFile).To(outputFile).Width(150).WatermarkFromText("stackrock.io").Execute()
 
-		fmt.Println("---- after creating job ----")
-		fmt.Printf("%+v\n", job)
-		fmt.Printf("%+v\n", err)
-		fmt.Println("--------------------------------")
-
 		Expect(err).To(BeNil())
 
 		fmt.Printf("Job id: %s\n" , job.Id)
+
 		status, err := job.Status()
 		Expect(err).To(BeNil())
+
 		fmt.Println(status)
-		Eventually(job.Status()).Should(Equal("done"))
+
+		checkFn := func() string {
+			status, err := job.Status()
+			Expect(err).To(BeNil())
+			fmt.Println(status)
+			return status
+		}
+
+		Eventually(checkFn, "2m").Should(Equal("done"))
 	})
 
 	//var _ = Describe("summary", func() {
