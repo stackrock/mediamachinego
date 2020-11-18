@@ -24,20 +24,38 @@ type jobRequest struct {
 
 	// One of these two should be set
 	OutputURL  string     `json:"outputUrl,omitempty"`
-	OutputBlob *BlobStore `json:"outputBlob,omitempty"`
+	OutputBlob *Blob `json:"outputBlob,omitempty"`
 
 	// One of these two should be set
 	InputURL  string     `json:"inputUrl,omitempty"`
-	InputBlob *BlobStore `json:"inputBlob,omitempty"`
+	InputBlob *Blob `json:"inputBlob,omitempty"`
 }
 
-// BlobStore represents a bucket store like S3/Google Bucket/Azure Bucket
+type WatermarkImage struct {
+	Path string `json:"path,omitempty"`
+	ImageName string `json:"imageName,omitempty"`
+	Width uint8 `json:"width,omitempty"`
+	Height uint8 `json:"height,omitempty"`
+}
+
+// Watermark represent a watermark object to be used in the image/gif/video.
+// This watermark can be either a text or an image.
+type Watermark struct {
+	WatermarkText string `json:"text,omitempty"`
+	WatermarkImage *WatermarkImage `json:"image,omitempty"`
+	WatermarkFontSize uint8 `json:"fontSize,omitempty"`
+	WatermarkColor string `json:"color,omitempty"`
+	WatermarkOpacity float64 `json:"opacity,omitempty"`
+	WatermarkPosition string `json:"position,omitempty"`// oneOf: topLeft, topRight, bottomLeft, bottomRight
+}
+
+// Blob represents a bucket store like S3/Google Bucket/Azure Bucket
 // where objects are presented by a combination of bucket + (prefixed) keys
-type BlobStore struct {
+type Blob struct {
 	// One of: s3,gcp,azure
 	Store  string `json:"store"`
-	Bucket string `json:"bucket"`
-	Key    string `json:"key"`
+	BucketName string `json:"bucket"`
+	KeyPath   string `json:"key"`
 
 	// Any one of these three
 	AwsCreds   *AWSCreds       `json:"awsCreds"`
@@ -45,6 +63,61 @@ type BlobStore struct {
 	GCPCreds   json.RawMessage `json:"gcpCreds"`
 }
 
+func newBlobWithDefaults() *Blob{
+	return &Blob{}
+}
+
+func NewS3BlobWithDefaults() *Blob {
+	blob := newBlobWithDefaults()
+	blob.Store = "s3"
+	return blob
+}
+
+func NewAzureBlobWithDefaults() *Blob {
+	blob := newBlobWithDefaults()
+	blob.Store = "azure"
+	return blob
+}
+
+func NewGCPBlobWithDefaults() *Blob {
+	blob := newBlobWithDefaults()
+	blob.Store = "gcp"
+	return blob
+}
+
+func (b *Blob) Bucket(bucketName string) *Blob {
+	b.BucketName = bucketName
+	return b
+}
+
+func (b *Blob) Key(key string) *Blob {
+	b.KeyPath = key
+	return b
+}
+
+func (b *Blob) AWSCredentials(accessKeyId string, secretAccessKey string, region string) *Blob {
+	creds := &AWSCreds{
+		AccessKeyID:     accessKeyId,
+		SecretAccessKey: secretAccessKey,
+		Region:          region,
+	}
+	b.AwsCreds = creds
+	return b
+}
+
+func (b *Blob) AzureCredentials(accountName string, accountKey string) * Blob {
+	creds := &AzureCreds{
+		AccountName: accountName,
+		AccountKey:  accountKey,
+	}
+	b.AzureCreds = creds
+	return b
+}
+
+func (b * Blob) GCPCredentials(json json.RawMessage) *Blob {
+	b.GCPCreds = json
+	return b
+}
 // AWSCreds - re-usable aws credentials that can be attached to a BlobStore
 // Allows callers to mix-and-match blob stores. Callers are encouraged to
 // provide the smallest surface-area credentials.
@@ -65,47 +138,6 @@ type AzureCreds struct {
 // JobOpt is a convenience helper for fluently building job requests
 type JobOpt = func(tr jobRequest)
 
-func APIKey(apiKey string) JobOpt {
-	return func(jr jobRequest) { jr.APIKey = apiKey }
-}
-
-func Webhooks(success, failure string) JobOpt {
-	return func(jr jobRequest) { jr.SuccessURL = success; jr.FailureURL = failure }
-}
-func OutputURL(url string) JobOpt {
-	return func(jr jobRequest) { jr.OutputURL = url }
-}
-func InputURL(url string) JobOpt {
-	return func(tr jobRequest) { tr.InputURL = url }
-}
-
-func S3Input(bucket, key string, creds AWSCreds) JobOpt {
-	return inputBlob(BlobStore{Store: "s3", Bucket: bucket, Key: key, AwsCreds: &creds})
-}
-func S3Output(bucket, key string, creds AWSCreds) JobOpt {
-	return outputBlob(BlobStore{Store: "s3", Bucket: bucket, Key: key, AwsCreds: &creds})
-}
-
-func GCPInput(bucket, key string, creds json.RawMessage) JobOpt {
-	return inputBlob(BlobStore{Store: "gcp", Bucket: bucket, Key: key, GCPCreds: creds})
-}
-func GCPOutput(bucket, key string, creds json.RawMessage) JobOpt {
-	return outputBlob(BlobStore{Store: "gcp", Bucket: bucket, Key: key, GCPCreds: creds})
-}
-
-func AzureInput(bucket, key string, creds AzureCreds) JobOpt {
-	return inputBlob(BlobStore{Store: "azure", Bucket: bucket, Key: key, AzureCreds: &creds})
-}
-func AzureOutput(bucket, key string, creds AzureCreds) JobOpt {
-	return outputBlob(BlobStore{Store: "azure", Bucket: bucket, Key: key, AzureCreds: &creds})
-}
-
-func outputBlob(blob BlobStore) JobOpt {
-	return func(jr jobRequest) { jr.OutputBlob = &blob }
-}
-func inputBlob(blob BlobStore) JobOpt {
-	return func(jr jobRequest) { jr.InputBlob = &blob }
-}
 
 func sendRequest(service string, reqBody json.RawMessage) (Job, error) {
 	url := Settings.URL + "/" + service
