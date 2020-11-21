@@ -15,13 +15,6 @@ trigger:
     - hourly
 
 steps:
-  - name: install ginkgo
-    pull: if-not-exists
-    image: arm64v8/golang:1.15-alpine
-    commands:
-      - go get github.com/onsi/ginkgo/ginkgo
-      - go get github.com/onsi/gomega/...
-
   - name: tracerBullets
     pull: if-not-exists
     image: arm64v8/golang:1.15-alpine
@@ -48,9 +41,9 @@ steps:
         from_secret: SUMMARY_MP4_OUTPUT_KEY
       OUTPUT_KEY_TRANSCODE:
         from_secret: TRANSCODE_OUTPUT_KEY
-    depends_on:
-      - install ginkgo
     commands:
+      - go get github.com/onsi/ginkgo/ginkgo
+      - go get github.com/onsi/gomega/...
       - ginkgo -p -focus "tracer"
 
 
@@ -81,13 +74,6 @@ trigger:
     - master
 
 steps:
-  - name: install ginkgo
-    pull: if-not-exists
-    image: arm64v8/golang:1.15-alpine
-    commands:
-      - go get github.com/onsi/ginkgo/ginkgo
-      - go get github.com/onsi/gomega/...
-
   - name: tracerBullets
     pull: if-not-exists
     image: arm64v8/golang:1.15-alpine
@@ -114,11 +100,10 @@ steps:
         from_secret: SUMMARY_MP4_OUTPUT_KEY
       OUTPUT_KEY_TRANSCODE:
         from_secret: TRANSCODE_OUTPUT_KEY
-    depends_on:
-      - install ginkgo
     commands:
+      - go get github.com/onsi/ginkgo/ginkgo
+      - go get github.com/onsi/gomega/...
       - ginkgo -p -focus "tracer"
-
 
   - name: slack
     image: plugins/slack
