@@ -101,7 +101,7 @@ steps:
       OUTPUT_KEY_TRANSCODE:
         from_secret: TRANSCODE_OUTPUT_KEY
     commands:
-      - apk add gcc
+      - apk add gcc musl-dev
       - go get github.com/onsi/ginkgo/ginkgo
       - go get github.com/onsi/gomega/...
       - ginkgo -p -focus "tracer"
