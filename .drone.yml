@@ -116,6 +116,6 @@ steps:
         from_secret: SLACK_CHANNEL
       link_names: true
     when:
-      status: [success, failure]
+      status: [failure]
     depends_on:
       - tracerBullets
