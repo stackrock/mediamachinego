@@ -126,7 +126,7 @@ var _ = Describe("tracer", func() {
 	It("tracer - Transcode", func() {
 		var STACKROCK_API_KEY = os.Getenv("STACKROCK_API_KEY")
 		var BUCKET = os.Getenv("BUCKET")
-		var INPUT_KEY = os.Getenv("INPUT_KEY")
+		var INPUT_KEY = os.Getenv("TRANSCODE_INPUT_KEY")
 		var OUTPUT_KEY = os.Getenv("OUTPUT_KEY_TRANSCODE")
 		var AWS_REGION = os.Getenv("AWS_REGION")
 		var AWS_ACCESS_KEY_ID = os.Getenv("AWS_ACCESS_KEY_ID")

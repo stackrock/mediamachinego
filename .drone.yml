@@ -37,7 +37,9 @@ steps:
       AWS_SECRET_ACCESS_KEY:
         from_secret: AWS_SECRET_ACCESS_KEY
       INPUT_KEY:
-        from_secret: THUMBNAIL_INPUT_KEY
+        from_secret: INPUT_KEY
+      TRANSCODE_INPUT_KEY:
+        from_secret: TRANSCODE_INPUT_KEY
       OUTPUT_KEY_THUMBNAIL:
         from_secret: THUMBNAIL_OUTPUT_KEY
       OUTPUT_KEY_SUMMARY_GIF:
@@ -101,7 +103,9 @@ steps:
       AWS_SECRET_ACCESS_KEY:
         from_secret: AWS_SECRET_ACCESS_KEY
       INPUT_KEY:
-        from_secret: THUMBNAIL_INPUT_KEY
+        from_secret: INPUT_KEY
+      TRANSCODE_INPUT_KEY:
+        from_secret: TRANSCODE_INPUT_KEY
       OUTPUT_KEY_THUMBNAIL:
         from_secret: THUMBNAIL_OUTPUT_KEY
       OUTPUT_KEY_SUMMARY_GIF:
