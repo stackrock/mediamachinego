@@ -70,7 +70,7 @@ func (to *TranscodeOpts) VideoSize(videoSize TranscodeVideoSize) *TranscodeOpts 
 type TranscodeJob struct {
 	jobRequest
 	WidthInt uint16 `json:"width,omitempty"`
-	Watermark *Watermark `json:"watermark,omitempty"`
+	TranscodeWatermark *Watermark `json:"watermark,omitempty"`
 	TranscodeOpts *TranscodeOpts `json:"transcode,omitemtpy"`
 }
 
@@ -121,6 +121,11 @@ func (tj *TranscodeJob) Width(width uint16) *TranscodeJob {
 	return tj
 }
 
+func (tj *TranscodeJob) Watermark(watermark *Watermark) *TranscodeJob {
+	tj.TranscodeWatermark = watermark
+	return tj
+}
+
 func (tj *TranscodeJob) WatermarkFromText(text string) *TranscodeJob {
 	w := &Watermark{
 		WatermarkText:     text,
@@ -130,7 +135,7 @@ func (tj *TranscodeJob) WatermarkFromText(text string) *TranscodeJob {
 		WatermarkPosition: PositionBottomLeft,
 	}
 
-	tj.Watermark = w
+	tj.TranscodeWatermark = w
 	return tj
 }
 

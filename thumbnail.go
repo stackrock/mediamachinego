@@ -10,7 +10,7 @@ import (
 type ThumbnailJob struct {
 	jobRequest
 	WidthInt uint16 `json:"width,omitempty"`
-	Watermark *Watermark `json:"watermark,omitemtpy"`
+	ThumbnailWatermark *Watermark `json:"watermark,omitemtpy"`
 }
 // Thumbnail - create an intelligent thumbnail for the input video.
 // StackRock will intelligently search the video to find the best thumbnail and
@@ -60,6 +60,11 @@ func (tj *ThumbnailJob) Width(width uint16) *ThumbnailJob {
 	return tj
 }
 
+func (tj *ThumbnailJob) Watermark(watermark *Watermark) *ThumbnailJob {
+	tj.ThumbnailWatermark = watermark
+	return tj
+}
+
 func (tj *ThumbnailJob) WatermarkFromText(text string) *ThumbnailJob {
 	w := &Watermark{
 		WatermarkText:     text,
@@ -69,7 +74,7 @@ func (tj *ThumbnailJob) WatermarkFromText(text string) *ThumbnailJob {
 		WatermarkPosition: PositionBottomLeft,
 	}
 
-	tj.Watermark = w
+	tj.ThumbnailWatermark = w
 	return tj
 }
 
