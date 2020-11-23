@@ -32,7 +32,7 @@ const (
 type SummaryJob struct {
 	jobRequest
 	WidthInt uint16 `json:"width,omitempty"`
-	Watermark *Watermark `json:"watermark,omitempty"`
+	SummaryWatermark *Watermark `json:"watermark,omitempty"`
 	SummaryType SummaryType `json:"-"`
 }
 
@@ -80,6 +80,11 @@ func (sj *SummaryJob) Width(width uint16) *SummaryJob {
 	return sj
 }
 
+func (sj *SummaryJob) Watermark(watermark *Watermark) *SummaryJob {
+	sj.SummaryWatermark = watermark
+	return sj
+}
+
 func (sj *SummaryJob) WatermarkFromText(text string) *SummaryJob {
 	w := &Watermark{
 		WatermarkText:     text,
@@ -89,7 +94,7 @@ func (sj *SummaryJob) WatermarkFromText(text string) *SummaryJob {
 		WatermarkPosition: PositionBottomLeft,
 	}
 
-	sj.Watermark = w
+	sj.SummaryWatermark = w
 	return sj
 }
 
