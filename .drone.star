@@ -57,9 +57,10 @@ def pipeline(kind):
 					}
                 },
                 "commands": [
-                      "go get github.com/onsi/ginkgo/ginkgo",
-                      "go get github.com/onsi/gomega/...",
-                      'ginkgo -p -focus "tracer"'
+                	"apk add gcc musl-dev",
+                    "go get github.com/onsi/ginkgo/ginkgo",
+                    "go get github.com/onsi/gomega/...",
+                    'ginkgo -p -focus "tracer"'
                 ]
             },
             {
