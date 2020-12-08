@@ -78,7 +78,7 @@ var _ = Describe("tracer", func() {
 			return status
 		}
 
-		Eventually(checkFn, "2m").Should(Equal("done"))
+		Eventually(checkFn, "5m").Should(Equal("done"))
 	})
 
 	/*
