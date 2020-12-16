@@ -31,11 +31,19 @@ var Settings = SDKSettings{
 	userAgent: "Stackrock/1.0.0 [Go]",
 }
 
+// Job is the struct that represent a thumbnail/summary/transcode job running on our server.
+// a Job can be on one of the three following states: `queued`, `done`, `errored`.
+// If the Job is on `queued` state, it means that it hasn't been processed yet.
+// If the Job is on `done` state, it means that the job is done and the output is located on the provided output provider.
+// If the Job is on `errored` state, it means that the processing failed.
 type Job struct {
 	Id        string    `json:"id"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 
+// Status fetch the current status of the Job and returns a string and error.
+// The string will contain some of the following values: `queued`, `done`, `errored`.
+// error will only contains something if the communication with MediaMachine server fails.
 func (job Job) Status() (string, error) {
 	if job.Id == "" {
 		return "", fmt.Errorf("cannot fetch job status: job Id is not set")
