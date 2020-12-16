@@ -30,11 +30,10 @@ var _ = Describe("tracer", func() {
 
 		Expect(err).To(BeNil())
 
-		fmt.Printf("Job id: %s\n" , job.Id)
+		fmt.Printf("Job id: %s\n", job.Id)
 
 		_, err = job.Status()
 		Expect(err).To(BeNil())
-
 
 		checkFn := func() string {
 			status, err := job.Status()
@@ -67,7 +66,7 @@ var _ = Describe("tracer", func() {
 
 		Expect(err).To(BeNil())
 
-		fmt.Printf("Job id: %s\n" , job.Id)
+		fmt.Printf("Job id: %s\n", job.Id)
 
 		_, err = job.Status()
 		Expect(err).To(BeNil())
@@ -103,7 +102,7 @@ var _ = Describe("tracer", func() {
 
 		Expect(err).To(BeNil())
 
-		fmt.Printf("Job id: %s\n" , job.Id)
+		fmt.Printf("Job id: %s\n", job.Id)
 
 		_, err = job.Status()
 		Expect(err).To(BeNil())
@@ -141,7 +140,7 @@ var _ = Describe("tracer", func() {
 
 		Expect(err).To(BeNil())
 
-		fmt.Printf("Job id: %s\n" , job.Id)
+		fmt.Printf("Job id: %s\n", job.Id)
 
 		_, err = job.Status()
 		Expect(err).To(BeNil())
@@ -155,4 +154,3 @@ var _ = Describe("tracer", func() {
 		Eventually(checkFn, "10m").Should(Equal("done"))
 	})
 })
-
