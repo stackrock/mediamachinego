@@ -3,74 +3,63 @@ package mediamachine
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
-// SDKSettings - callers can override the URL if needed. No change needed by default.
-type SDKSettings struct {
-	URL       string
-	userAgent string
-}
-
-// Error - StackRock library error usually occurs if StackRock server was unable to accept the request.
-type Error struct {
-	Code    string `json:"error_code"`
-	Message string `json:"message"`
-	Status  string `json:"status"`
-}
-
-// Error returns a string representation of the error
-func (e Error) Error() string {
-	return fmt.Sprintf("%s (code: %s)", e.Message, e.Code)
-}
-
-var Settings = SDKSettings{
-	URL:       getEnv("STACKROCK_URL", "https://api.stackrock.io"),
-	userAgent: "Stackrock/1.0.0 [Go]",
-}
-
-// Job is the struct that represent a thumbnail/summary/transcode job running on our server.
-// a Job can be on one of the three following states: `queued`, `done`, `errored`.
-// If the Job is on `queued` state, it means that it hasn't been processed yet.
-// If the Job is on `done` state, it means that the job is done and the output is located on the provided output provider.
-// If the Job is on `errored` state, it means that the processing failed.
-type Job struct {
-	Id        string    `json:"id"`
-	CreatedAt time.Time `json:"createdAt"`
-}
-
-// Status fetch the current status of the Job and returns a string and error.
-// The string will contain some of the following values: `queued`, `done`, `errored`.
-// error will only contains something if the communication with MediaMachine server fails.
-func (job Job) Status() (string, error) {
-	if job.Id == "" {
-		return "", fmt.Errorf("cannot fetch job status: job Id is not set")
-	}
-	resp, err := http.Get(Settings.URL + "/job/status?reqId=" + job.Id)
-	if err != nil {
-		return "", err
-	}
-
-	payload := map[string]string{}
-	err = json.NewDecoder(resp.Body).Decode(&payload)
-	if err != nil {
-		return "", err
-	}
-	return payload["status"], nil
-}
-
 const (
-	SvcThumbnail  = "thumbnail"
-	SvcSummaryGIF = "summary/gif"
-	SvcSummaryMP4 = "summary/mp4"
+	version     = "1.0.0"
+	ua          = "Stackrock/MediaMachine/Go/" + version
+	apiEndpoint = "https://api.stackrock.io"
 )
 
-func getEnv(key, defaultValue string) string {
-	value := os.Getenv(key)
-	if len(value) == 0 {
-		return defaultValue
+// MediaMachine gives you access to the various operations you can perform using the StackRock API.
+type MediaMachine struct {
+	APIKey string // Your stackrock API key goes here
+}
+
+var httpClient = http.Client{Timeout: time.Second * 10}
+
+func (m MediaMachine) submit(path string, body io.Reader) (Job, error) {
+	j := Job{}
+	req, err := http.NewRequest("POST", apiEndpoint+path, body)
+	if err != nil {
+		return j, err
 	}
-	return value
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("User-Agent", ua)
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return j, err
+	}
+
+	// read body
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return j, err
+	}
+
+	// parse body
+	payload := make(map[string]interface{})
+	if err = json.Unmarshal(respBody, &payload); err != nil {
+		log.Printf("unexpected server response: %s", respBody)
+		return j, err
+	}
+
+	// errored
+	if payload["error"] != nil {
+		return j, fmt.Errorf("failed to submit job to MediaMachine API. Error: %s", payload["error"])
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		err = json.Unmarshal(respBody, &j)
+		return j, err
+	}
+
+	return j, fmt.Errorf("unexpected server response: %s", payload)
 }
