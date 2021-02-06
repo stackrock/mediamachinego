@@ -3,8 +3,6 @@ package mediamachine
 import (
 	"bytes"
 	"encoding/json"
-	"net/http"
-	"time"
 )
 
 // TranscodeEncoder is the type representing the type of encoder that can be used for
@@ -21,12 +19,14 @@ type TranscodeContainer = string
 type TranscodeVideoSize = string
 
 const (
-	// ENCODER_H264 is the configuration for a `h264` encoder.
-	ENCODER_H264 TranscodeEncoder = "h264"
-	// ENCODER_H265 is the configuration for a `h265` encoder.
-	ENCODER_H265 TranscodeEncoder = "h265"
-	// ENCODER_VP8 is the configuration for a `vp8` encoder.
-	ENCODER_VP8 TranscodeEncoder = "vp8"
+	// EncoderH264 is the configuration for a `h264` encoder.
+	EncoderH264 TranscodeEncoder = "h264"
+	// EncoderH265 is the configuration for a `h265` encoder.
+	EncoderH265 TranscodeEncoder = "h265"
+	// EncoderVp8 is the configuration for a `vp8` encoder.
+	EncoderVp8 TranscodeEncoder = "vp8"
+	// EncoderVp9 is the configuration for a `vp9` encoder.
+	EncoderVp9 TranscodeEncoder = "vp9"
 
 	// BITRATE_EIGHT_MEGAKBPS is the configuration for a `8000 kbps` bitrate.
 	BITRATE_EIGHT_MEGAKBPS TranscodeBitrate = "8000"
@@ -35,224 +35,64 @@ const (
 	// BITRATE_ONE_MEGAKBPS is the configuration for a `1000 kbps` bitrate.
 	BITRATE_ONE_MEGAKBPS TranscodeBitrate = "1000"
 
-	// CONTAINER_MP4 is the configuration for a `mp4` video container.
-	CONTAINER_MP4 TranscodeContainer = "mp4"
-	// CONTAINER_WEBM is the configuration for a `webm` video container.
-	CONTAINER_WEBM TranscodeContainer = "webm"
+	// ContainerMP4 is the configuration for a `mp4` video container.
+	ContainerMP4 TranscodeContainer = "mp4"
+	// ContainerWebm is the configuration for a `webm` video container.
+	ContainerWebm TranscodeContainer = "webm"
 
-	// VIDEOSIZE_FULL_HD is the configuration for a `1080` video output.
-	VIDEOSIZE_FULL_HD = "1080"
-	// VIDEOSIZE_HD is the configuration for a `720` video output.
-	VIDEOSIZE_HD = "720"
-	// VIDEOSIZE_SD is the configuration for a `480` video output.
-	VIDEOSIZE_SD = "480"
+	//// VIDEOSIZE_FULL_HD is the configuration for a `1080` video output.
+	//VIDEOSIZE_FULL_HD = "1080"
+	//// VIDEOSIZE_HD is the configuration for a `720` video output.
+	//VIDEOSIZE_HD = "720"
+	//// VIDEOSIZE_SD is the configuration for a `480` video output.
+	//VIDEOSIZE_SD = "480"
 )
 
-// TranscodeOpts contains the configuration data of the output video of a transcode process.
-type TranscodeOpts struct {
-	TranscodeEncoder string `json:"encoder,omitempty"`
-	TranscodeBitrateKbps string `json:"bitrateKbps,omitempty"`
-	TranscodeContainer string `json:"container,omitempty"`
-	TranscodeVideoSize string `json:"videoSize,omitempty"`
+/* TranscodeConfig configures the request for a video summary.
+The input video location can be specified via the FromUrl or the From method.
+
+By default, the output has the same dimensions as the input video, set Width to desired value to customize.
+Height is automatically calculated according to input aspect ratio.
+*/
+type TranscodeConfig struct {
+	Container TranscodeContainer // required
+	Encoder   TranscodeEncoder   // required
+	Bitrate   TranscodeBitrate   // required
+
+	// Structured as {http|https|s3|azure|gcp}://{bucket-name}/{prefix-if-any}/{object-name}
+	// Examples: s3://bucket/prefix/input.mp4, https://example.com/files/input.mp4
+	InputURL  string
+	OutputURL string
+
+	// Provide credentials to S3/Azure/GCP for input/output locations
+	// Can be nil if using http(s) input/output urls - make sure url endpoints are accessible
+	// Note: You can use a different set of creds for input and output if you want to upload to a totally different
+	// account for example or to a different bucket if you generate keys specific to bucket etc. or reuse the same
+	// Creds object. See examples folder for usage.
+	InputCreds  Creds
+	OutputCreds Creds
+
+	Height uint // Optional - by default, the output has same height as input video
+	Width  uint // Optional - by default, the output has same width as input video
+
+	SuccessURL string // Optional - Expect a POST call when job is successfully finished
+	FailureURL string // Optional - Expect a POST call with failure details
 }
 
+/*
+Transcode enqueues a request to the MediaMachine backend to asynchronously transcode the input video.
 
-// NewTranscodeOptsWithDefaults returns a new TranscodeOpts struct configured with the
-// following default values:
-//   - Encoder: H264
-//   - Bitrate: 4000Kbps
-//   - Container: MP4
-//   - VideoSize: 720p
-func NewTranscodeOptsWithDefaults() *TranscodeOpts {
-	to := &TranscodeOpts{
-		TranscodeEncoder:     ENCODER_H264,
-		TranscodeBitrateKbps: BITRATE_FOUR_MEGAKBPS,
-		TranscodeContainer:   CONTAINER_MP4,
-		TranscodeVideoSize:   VIDEOSIZE_HD,
+The output video is uploaded to the location specified in the TranscodeConfig.
+Errors if the input configuration is invalid.
+*/
+func (m MediaMachine) Transcode(cfg TranscodeConfig) (Job, error) {
+	if err := validateInputOutput(cfg.InputURL, cfg.OutputURL, cfg.InputCreds, cfg.OutputCreds); err != nil {
+		return Job{}, err
 	}
 
-	return to
-}
-
-// Encoder configures the encoder used on the output video.
-// Valid options are:
-//   - ENCODER_H264
-//   - ENCODER_H265
-//   - ENCODER_VP8
-func (to *TranscodeOpts) Encoder(encoder TranscodeEncoder) *TranscodeOpts {
-	to.TranscodeEncoder = encoder
-	return to
-}
-
-// BitrateKbps configures the output bitrate.
-// Valid options are:
-//  - BITRATE_EIGHT_MEGAKBPS
-//  - BITRATE_FOUR_MEGAKBPS
-//  - BITRATE_ONE_MEGAKBPS
-func (to *TranscodeOpts) BitrateKbps(bitrate TranscodeBitrate) *TranscodeOpts {
-	to.TranscodeBitrateKbps = bitrate
-	return to
-}
-
-// Container configures the container format of the output.
-// Valid options are:
-//  - CONTAINER_MP4
-//  - CONTAINER_WEBM
-func (to *TranscodeOpts) Container(container TranscodeContainer) *TranscodeOpts {
-	to.TranscodeContainer = container
-	return to
-}
-
-// VideoSize configures the output video resolution.
-// Valid options are:
-//  - VIDEOSIZE_FULL_HD
-//  - VIDEOSIZE_HD
-//  - VIDEOSIZE_SD
-func (to *TranscodeOpts) VideoSize(videoSize TranscodeVideoSize) *TranscodeOpts {
-	to.TranscodeVideoSize = videoSize
-	return to
-}
-
-// TranscodeJob - transcode an input video from virtually any format to mp4/webm.
-// The input video location can be specified via the FromUrl or the From method.
-// Similarly, ToUrl or the To methods for transcode output video location.
-// By default, the transcoded video is the same {Width x Height} as the input video - use the Width method to customize
-type TranscodeJob struct {
-	JobRequest
-	WidthInt uint16 `json:"width,omitempty"`
-	TranscodeWatermark *Watermark `json:"watermark,omitempty"`
-	TranscodeOpts *TranscodeOpts `json:"transcode,omitemtpy"`
-}
-
-// NewTranscodeJobWithDefaults returns a configured TranscodeJob. The returned instance is configured
-// with the following defaults:
-//   - Encoder: H264
-//   - Bitrate: 4000Kbps
-//   - Container: MP4
-//   - VideoSize: 720p
-func NewTranscodeJobWithDefaults() *TranscodeJob {
-	opts := NewTranscodeOptsWithDefaults()
-
-	tj := &TranscodeJob{
-		TranscodeOpts: opts,
-	}
-
-	return tj
-}
-
-
-// ApiKey returns the TranscodeJob instance configured with the provided apiKey.
-func (tj *TranscodeJob) ApiKey(apiKey string) *TranscodeJob {
-	tj.APIKey = apiKey
-	return tj
-}
-
-// From returns the TranscodeJob instance configured with the Blob provided as an input file.
-// A Blob represents a file located on either Amazon S3, Google GCP or Azure File.
-func (tj *TranscodeJob) From(input *Blob) *TranscodeJob {
-	tj.InputBlob = input
-	return tj
-}
-
-// FromUrl returns the TranscodeJob instance configured with the url provided as an input file.
-func (tj *TranscodeJob) FromUrl(inputUrl string) *TranscodeJob {
-	tj.InputURL = inputUrl
-	return tj
-}
-
-// To returns the TranscodeJob instance configured with the Blob provided as an output file.
-// A Blob represents a file located on either Amazon S3, Google GCP or Azure File.
-func (tj *TranscodeJob) To(output *Blob) *TranscodeJob {
-	tj.OutputBlob = output
-	return tj
-}
-
-// ToUrl returns the TranscodeJob instance configured with the url provided as an input file.
-func (tj *TranscodeJob) ToUrl(outputUrl string) *TranscodeJob {
-	tj.OutputURL = outputUrl
-	return tj
-}
-
-// Webhooks returns the TranscodeJob instance configured with the success and failure
-// Webhooks configured. Success and failure are string representing urls that MediaMachine
-// are going to call in case of success or failure.
-func (tj *TranscodeJob) Webhooks(success, failure string) *TranscodeJob {
-	tj.SuccessURL = success
-	tj.FailureURL = failure
-	return tj
-}
-
-// Width returns the TranscodeJob instance configured with the output width of the video.
-func (tj *TranscodeJob) Width(width uint16) *TranscodeJob {
-	tj.WidthInt = width
-	return tj
-}
-
-// Watermark returns the TranscodeJob instance configured with the Watermark to be used on the
-// output video.
-func (tj *TranscodeJob) Watermark(watermark *Watermark) *TranscodeJob {
-	tj.TranscodeWatermark = watermark
-	return tj
-}
-
-// WatermarkFromText returns the TranscodeJob instance configured with a Watermark text to be
-// used on the output video. This Text will have a white color, font size of 12px, located on the bottom-left
-// corner of the video, and an opacity of 80%.
-func (tj *TranscodeJob) WatermarkFromText(text string) *TranscodeJob {
-	w := &Watermark{
-		WatermarkText:     text,
-		WatermarkFontSize: 12,
-		WatermarkColor:    "white",
-		WatermarkOpacity:  0.8,
-		WatermarkPosition: PositionBottomLeft,
-	}
-
-	tj.TranscodeWatermark = w
-	return tj
-}
-
-// Opts returns the TranscodeJob instance configured tiwh the TranscodeOpts provided.
-func (tj *TranscodeJob) Opts(opts *TranscodeOpts) *TranscodeJob {
-	tj.TranscodeOpts = opts
-	return tj
-}
-
-// Execute execute the transcode job, it returns the job and an error.
-// In case of an error, job will be nil and error will contain the cause of the error.
-func (tj *TranscodeJob) Execute() (*Job, error) {
-	body, err := json.Marshal(tj)
-	url := Settings.URL + "/transcode"
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
+	body, err := json.Marshal(cfg)
 	if err != nil {
-		return nil, err
+		return Job{}, err
 	}
-
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", Settings.userAgent)
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{
-		Timeout: time.Second * 10,
-	}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	decoder := json.NewDecoder(resp.Body)
-
-	// Job created successfully
-	if resp.StatusCode == http.StatusOK {
-		job := &Job{}
-		if err := decoder.Decode(&job); err != nil {
-			return nil, err
-		}
-		return job, nil
-	} else {
-		createErr := Error{}
-		if err := decoder.Decode(&createErr); err != nil {
-			return nil, err
-		}
-		return nil, createErr
-	}
+	return m.submit("/transcode", bytes.NewBuffer(body))
 }

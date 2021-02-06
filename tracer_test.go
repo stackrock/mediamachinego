@@ -9,12 +9,12 @@ import (
 
 var _ = Describe("tracer", func() {
 	/*
-	 * Tracer Bullet for a thumbnail job.
+	 * Tracer Bullet for a thumbnail-s3-compatible-store job.
 	 * We use this job internally at StackRock for two reasons:
 	 *  1) To keep the SDK in sync with API
 	 *  2) To Test our API is running as expected
 	 */
-	It("tracer - thumbnail", func() {
+	It("tracer - thumbnail-s3-compatible-store", func() {
 		var STACKROCK_API_KEY = os.Getenv("STACKROCK_API_KEY")
 		var BUCKET = os.Getenv("BUCKET")
 		var INPUT_KEY = os.Getenv("INPUT_KEY")
@@ -62,7 +62,7 @@ var _ = Describe("tracer", func() {
 		inputFile := NewS3BlobWithDefaults().Bucket(BUCKET).Key(INPUT_KEY).AWSCredentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
 		outputFile := NewS3BlobWithDefaults().Bucket(BUCKET).Key(OUTPUT_KEY).AWSCredentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
 
-		job, err := NewSummaryJobWithDefaults().ApiKey(STACKROCK_API_KEY).Type(SUMMARY_GIF).From(inputFile).To(outputFile).Width(150).WatermarkFromText("stackrock.io").Execute()
+		job, err := NewSummaryJobWithDefaults().ApiKey(STACKROCK_API_KEY).Type(SummaryTypeGif).From(inputFile).To(outputFile).Width(150).WatermarkFromText("stackrock.io").Execute()
 
 		Expect(err).To(BeNil())
 
@@ -98,7 +98,7 @@ var _ = Describe("tracer", func() {
 		inputFile := NewS3BlobWithDefaults().Bucket(BUCKET).Key(INPUT_KEY).AWSCredentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
 		outputFile := NewS3BlobWithDefaults().Bucket(BUCKET).Key(OUTPUT_KEY).AWSCredentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
 
-		job, err := NewSummaryJobWithDefaults().ApiKey(STACKROCK_API_KEY).Type(SUMMARY_MP4).From(inputFile).To(outputFile).Width(150).WatermarkFromText("stackrock.io").Execute()
+		job, err := NewSummaryJobWithDefaults().ApiKey(STACKROCK_API_KEY).Type(SummaryTypeMp4).From(inputFile).To(outputFile).Width(150).WatermarkFromText("stackrock.io").Execute()
 
 		Expect(err).To(BeNil())
 
@@ -134,7 +134,7 @@ var _ = Describe("tracer", func() {
 		inputFile := NewS3BlobWithDefaults().Bucket(BUCKET).Key(INPUT_KEY).AWSCredentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
 		outputFile := NewS3BlobWithDefaults().Bucket(BUCKET).Key(OUTPUT_KEY).AWSCredentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
 
-		transcodeOpts := NewTranscodeOptsWithDefaults().Encoder(ENCODER_H264).BitrateKbps(BITRATE_FOUR_MEGAKBPS).Container(CONTAINER_MP4).VideoSize(VIDEOSIZE_HD)
+		transcodeOpts := NewTranscodeOptsWithDefaults().Encoder(EncoderH264).BitrateKbps(BITRATE_FOUR_MEGAKBPS).Container(ContainerMP4).VideoSize(VIDEOSIZE_HD)
 
 		job, err := NewTranscodeJobWithDefaults().ApiKey(STACKROCK_API_KEY).From(inputFile).To(outputFile).Width(150).WatermarkFromText("stackrock.io").Opts(transcodeOpts).Execute()
 
