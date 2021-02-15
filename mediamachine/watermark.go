@@ -27,10 +27,10 @@ type WatermarkImageURL struct {
 	Position WatermarkPosition // Where the watermark should be placed. See WatermarkPosition
 }
 
-// WatermarkImageNamed can be used to provide a reference to a watermark image uploaded to your stackrock account
+// WatermarkImageNamed can be used to provide a reference to a watermark image uploaded to your mediamachine account
 // You can easily upload your watermark images via account settings. The uploaded image gets a unique name that can be used here.
 type WatermarkImageNamed struct {
-	ImageName string            // Name of a watermark image uploaded on the stackrock account
+	ImageName string            // Name of a watermark image uploaded on the mediamachine account
 	Height    uint8             // Height of the watermark
 	Width     uint8             // Width of the watermark
 	Opacity   float32           // Opacity of watermark between 0 and 1 inclusive

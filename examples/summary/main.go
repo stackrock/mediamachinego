@@ -14,8 +14,8 @@ import (
 	"time"
 )
 
-// Use your StackRock API Key to initialize the MediaMachine SDK
-const apiKey = "my-stackrock-key"
+// Use your MediaMachine API Key to initialize the MediaMachine SDK
+const apiKey = "my-mediamachine-key"
 
 func main() {
 	mm := mediamachine.MediaMachine{APIKey: apiKey}

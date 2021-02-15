@@ -9,27 +9,27 @@ package main
 
 import (
 	"github.com/stackrock/mediamachinego/colors"
-	mediamachine2 "github.com/stackrock/mediamachinego/mediamachine"
+	"github.com/stackrock/mediamachinego/mediamachine"
 	"log"
 	"time"
 )
 
-// Use your StackRock API Key to initialize the MediaMachine SDK
-const apiKey = "my-stackrock-key"
+// Use your MediaMachine API Key to initialize the SDK
+const apiKey = "my-mediamachine-key"
 
 func main() {
-	mm := mediamachine2.MediaMachine{APIKey: apiKey}
+	mm := mediamachine.MediaMachine{APIKey: apiKey}
 
 	// Using S3: input video from s3, output uploaded to s3
 	// It is a good security practice to make narrow scoped AWS access keys
 	// that only restrict access to a specific bucket (or even specific prefixes and objects if needed).
-	creds := mediamachine2.CredsAWS{
+	creds := mediamachine.CredsAWS{
 		AccessKeyID:     "my-aws-access-key-id",
 		SecretAccessKey: "my-aws-secret-access-key",
 		Region:          "my-aws-region",
 	}
 
-	s3Job, err := mm.Thumbnail(mediamachine2.ThumbnailConfig{
+	s3Job, err := mm.Thumbnail(mediamachine.ThumbnailConfig{
 		InputURL:  "s3://example-bucket/my-awesome-video.mp4",
 		OutputURL: "s3://example-bucket/my-awesome-video-thumbnail.jpg",
 		// account for example or to a different bucket if you generate keys specific to bucket etc.
@@ -37,12 +37,12 @@ func main() {
 		InputCreds:  creds,
 		OutputCreds: creds,
 		Width:       500, // Defaults to size of input
-		Watermark: mediamachine2.WatermarkText{
+		Watermark: mediamachine.WatermarkText{
 			Text:      "My Awesome Company",
 			FontSize:  10,
 			FontColor: colors.Brown, // See docs for other color options
 			Opacity:   0.5,          // Should be between [0,1]
-			Position:  mediamachine2.PositionBottomLeft,
+			Position:  mediamachine.PositionBottomLeft,
 		},
 		// You can opt to get notified via webhooks here or periodically check job status depending on your preferred setup
 		SuccessURL: "https://example.com/mediamachine/jobdone",
@@ -57,16 +57,16 @@ func main() {
 	// If your video assets are served via a file server, you can directly use their urls. You can also mix-and-match
 	// using file server urls and bucket stores.
 	// Example for videos served via a file server:
-	fileServerJob, err := mm.Thumbnail(mediamachine2.ThumbnailConfig{
+	fileServerJob, err := mm.Thumbnail(mediamachine.ThumbnailConfig{
 		InputURL:  "https://example.com/my-awesome-video.mp4",
 		OutputURL: "https://example.com/my-awesome-video-thumbnail.jpg",
 		Width:     500, // Defaults to size of input
-		Watermark: mediamachine2.WatermarkText{
+		Watermark: mediamachine.WatermarkText{
 			Text:      "My Awesome Company",
 			FontSize:  10,
 			FontColor: colors.Brown, // See docs for other color options
 			Opacity:   0.5,          // Should be between [0,1]
-			Position:  mediamachine2.PositionBottomLeft,
+			Position:  mediamachine.PositionBottomLeft,
 		},
 		// You can opt to get notified via webhooks here or periodically check job status depending on your preferred setup
 		SuccessURL: "https://example.com/mediamachine/jobdone",
@@ -79,7 +79,7 @@ func main() {
 	}
 
 	// Example function for waiting for job completion
-	waitForJob := func(job mediamachine2.Job, done chan struct{}) {
+	waitForJob := func(job mediamachine.Job, done chan struct{}) {
 		for range time.NewTicker(time.Second * 60).C {
 			status, err := job.FetchStatus()
 			if err != nil {
@@ -89,11 +89,11 @@ func main() {
 			}
 
 			switch status {
-			case mediamachine2.JobStatusDone:
+			case mediamachine.JobStatusDone:
 				log.Printf("thumbnail is ready! JobId: %s", job.ID)
 				done <- struct{}{}
 				return
-			case mediamachine2.JobStatusErrored:
+			case mediamachine.JobStatusErrored:
 				log.Printf("thumbnail creation failed :( JobId: %s", job.ID)
 				done <- struct{}{}
 				return
