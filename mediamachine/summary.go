@@ -40,7 +40,7 @@ type SummaryConfig struct {
 	OutputCreds Creds
 
 	Width     uint      // Optional - by default, the output has same width as input video
-	Watermark watermark // Optional
+	Watermark Watermark // Optional
 
 	SuccessURL string // Optional - Expect a POST call when job is successfully finished
 	FailureURL string // Optional - Expect a POST call with failure details
