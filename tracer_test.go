@@ -1,24 +1,24 @@
-package mediamachine
+package mediamachine_test
 
 import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/stackrock/mediamachinego"
 	"github.com/stackrock/mediamachinego/colors"
 	"os"
 )
 
+var STACKROCK_API_KEY = os.Getenv("STACKROCK_API_KEY")
+var BUCKET = os.Getenv("BUCKET")
+var INPUT_KEY = os.Getenv("INPUT_KEY")
+var OUTPUT_KEY = os.Getenv("OUTPUT_KEY_SUMMARY_GIF")
+var AWS_REGION = os.Getenv("AWS_REGION")
+var AWS_ACCESS_KEY_ID = os.Getenv("AWS_ACCESS_KEY_ID")
+var AWS_SECRET_ACCESS_KEY = os.Getenv("AWS_SECRET_ACCESS_KEY")
+var mm = MediaMachine{APIKey: STACKROCK_API_KEY}
+
 var _ = Describe("tracer", func() {
-	var STACKROCK_API_KEY = os.Getenv("STACKROCK_API_KEY")
-	var BUCKET = os.Getenv("BUCKET")
-	var INPUT_KEY = os.Getenv("INPUT_KEY")
-	var OUTPUT_KEY = os.Getenv("OUTPUT_KEY_SUMMARY_GIF")
-	var AWS_REGION = os.Getenv("AWS_REGION")
-	var AWS_ACCESS_KEY_ID = os.Getenv("AWS_ACCESS_KEY_ID")
-	var AWS_SECRET_ACCESS_KEY = os.Getenv("AWS_SECRET_ACCESS_KEY")
-
-	mm := MediaMachine{APIKey: STACKROCK_API_KEY}
-
 	// Using S3: input video from s3, output uploaded to s3
 	// It is a good security practice to make narrow scoped AWS access keys
 	// that only restrict access to a specific bucket (or even specific prefixes and objects if needed).
