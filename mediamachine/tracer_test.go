@@ -2,11 +2,13 @@ package mediamachine_test
 
 import (
 	"fmt"
+	"os"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
 	"github.com/stackrock/mediamachinego/colors"
 	"github.com/stackrock/mediamachinego/mediamachine"
-	"os"
 )
 
 var STACKROCK_API_KEY = os.Getenv("STACKROCK_API_KEY")
@@ -22,7 +24,7 @@ var _ = Describe("tracer", func() {
 	// Using S3: input video from s3, output uploaded to s3
 	// It is a good security practice to make narrow scoped AWS access keys
 	// that only restrict access to a specific bucket (or even specific prefixes and objects if needed).
-	creds := CredsAWS{
+	creds := mediamachine.CredsAWS{
 		AccessKeyID:     AWS_ACCESS_KEY_ID,
 		SecretAccessKey: AWS_SECRET_ACCESS_KEY,
 		Region:          AWS_REGION,
