@@ -24,8 +24,7 @@ By default, the output has the same dimensions as the input video, set Width to 
 Height is automatically calculated according to input aspect ratio.
 */
 type SummaryConfig struct {
-	Type        SummaryType `json:"-"` // Specifies summary output format
-	RemoveAudio bool        // Only applicable when Type is set to SummaryTypeMp4, ignored otherwise
+	RemoveAudio bool // Only applicable when Type is set to SummaryTypeMp4, ignored otherwise
 
 	// Structured as {http|https|s3|azure|gcp}://{bucket-name}/{prefix-if-any}/{object-name}
 	// Examples: s3://bucket/prefix/input.mp4, https://example.com/files/input.mp4
@@ -48,21 +47,42 @@ type SummaryConfig struct {
 }
 
 /*
-Thumbnail enqueues a request to the MediaMachine backend to asynchronously generate a thumbnail-s3-compatible-store for the input video.
+Summary enqueues a request to the MediaMachine backend to asynchronously generate a summary uploaded to an s3-compatible-store for the input video.
 
-The output image is uploaded to the location specified in the ThumbnailConfig.
+The output image is uploaded to the location specified in the SummaryConfig.
 Errors if the input configuration is invalid.
 */
-func (m MediaMachine) Summary(cfg SummaryConfig) (Job, error) {
+func (m MediaMachine) SummaryGIF(cfg SummaryConfig) (Job, error) {
+	return m.summary(SummaryTypeGif, cfg)
+}
+
+/*
+Summary enqueues a request to the MediaMachine backend to asynchronously generate a summary uploaded to an s3-compatible-store for the input video.
+
+The output image is uploaded to the location specified in the SummaryConfig.
+Errors if the input configuration is invalid.
+*/
+func (m MediaMachine) SummaryMP4(cfg SummaryConfig) (Job, error) {
+	return m.summary(SummaryTypeMp4, cfg)
+}
+
+func (m MediaMachine) summary(summaryType SummaryType, cfg SummaryConfig) (Job, error) {
 	if err := validateInputOutput(cfg.InputURL, cfg.OutputURL, cfg.InputCreds, cfg.OutputCreds); err != nil {
 		return Job{}, err
 	}
+	sr := struct {
+		APIKey string
+		SummaryConfig
+	}{
+		APIKey:        m.APIKey,
+		SummaryConfig: cfg,
+	}
 
-	body, err := json.Marshal(cfg)
+	body, err := json.Marshal(sr)
 	if err != nil {
 		return Job{}, err
 	}
-	return m.submit("/summary/"+cfg.Type, bytes.NewBuffer(body))
+	return m.submit("/summary/"+summaryType, bytes.NewBuffer(body))
 }
 
 func validateInputOutput(inputURL, outputURL string, inputCreds, outputCreds Creds) error {

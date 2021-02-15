@@ -13,7 +13,7 @@ import (
 const (
 	version     = "1.0.0"
 	ua          = "Stackrock/MediaMachine/Go/" + version
-	apiEndpoint = "https://api.stackrock.io"
+	apiEndpoint = "https://api.mediamachine.io"
 )
 
 // MediaMachine gives you access to the various operations you can perform using the StackRock API.

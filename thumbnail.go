@@ -44,7 +44,15 @@ func (m MediaMachine) Thumbnail(cfg ThumbnailConfig) (Job, error) {
 		return Job{}, err
 	}
 
-	body, err := json.Marshal(cfg)
+	tr := struct {
+		APIKey string
+		ThumbnailConfig
+	}{
+		APIKey:          m.APIKey,
+		ThumbnailConfig: cfg,
+	}
+
+	body, err := json.Marshal(tr)
 	if err != nil {
 		return Job{}, err
 	}

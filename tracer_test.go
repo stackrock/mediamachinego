@@ -4,10 +4,30 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/stackrock/mediamachinego/colors"
 	"os"
 )
 
 var _ = Describe("tracer", func() {
+	var STACKROCK_API_KEY = os.Getenv("STACKROCK_API_KEY")
+	var BUCKET = os.Getenv("BUCKET")
+	var INPUT_KEY = os.Getenv("INPUT_KEY")
+	var OUTPUT_KEY = os.Getenv("OUTPUT_KEY_SUMMARY_GIF")
+	var AWS_REGION = os.Getenv("AWS_REGION")
+	var AWS_ACCESS_KEY_ID = os.Getenv("AWS_ACCESS_KEY_ID")
+	var AWS_SECRET_ACCESS_KEY = os.Getenv("AWS_SECRET_ACCESS_KEY")
+
+	mm := MediaMachine{APIKey: STACKROCK_API_KEY}
+
+	// Using S3: input video from s3, output uploaded to s3
+	// It is a good security practice to make narrow scoped AWS access keys
+	// that only restrict access to a specific bucket (or even specific prefixes and objects if needed).
+	creds := CredsAWS{
+		AccessKeyID:     AWS_ACCESS_KEY_ID,
+		SecretAccessKey: AWS_SECRET_ACCESS_KEY,
+		Region:          AWS_REGION,
+	}
+
 	/*
 	 * Tracer Bullet for a thumbnail-s3-compatible-store job.
 	 * We use this job internally at StackRock for two reasons:
@@ -15,33 +35,37 @@ var _ = Describe("tracer", func() {
 	 *  2) To Test our API is running as expected
 	 */
 	It("tracer - thumbnail-s3-compatible-store", func() {
-		var STACKROCK_API_KEY = os.Getenv("STACKROCK_API_KEY")
-		var BUCKET = os.Getenv("BUCKET")
-		var INPUT_KEY = os.Getenv("INPUT_KEY")
-		var OUTPUT_KEY = os.Getenv("OUTPUT_KEY_THUMBNAIL")
-		var AWS_REGION = os.Getenv("AWS_REGION")
-		var AWS_ACCESS_KEY_ID = os.Getenv("AWS_ACCESS_KEY_ID")
-		var AWS_SECRET_ACCESS_KEY = os.Getenv("AWS_SECRET_ACCESS_KEY")
-
-		inputFile := NewS3BlobWithDefaults().Bucket(BUCKET).Key(INPUT_KEY).AWSCredentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
-		outputFile := NewS3BlobWithDefaults().Bucket(BUCKET).Key(OUTPUT_KEY).AWSCredentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
-
-		job, err := NewThumbnailJobWithDefaults().ApiKey(STACKROCK_API_KEY).From(inputFile).To(outputFile).Width(150).WatermarkFromText("stackrock.io").Execute()
+		job, err := mm.Thumbnail(ThumbnailConfig{
+			InputURL:  fmt.Sprintf("s3://%s/%s", BUCKET, INPUT_KEY),
+			OutputURL: fmt.Sprintf("s3://%s/%s", BUCKET, OUTPUT_KEY),
+			// account for example or to a different bucket if you generate keys specific to bucket etc.
+			// Note: You can use a different set of creds for input and output if you want to upload to a totally different
+			InputCreds:  creds,
+			OutputCreds: creds,
+			Width:       500, // Defaults to size of input
+			Watermark: WatermarkText{
+				Text:      "My Awesome Company",
+				FontSize:  10,
+				FontColor: colors.Brown, // See docs for other color options
+				Opacity:   0.5,          // Should be between [0,1]
+				Position:  PositionBottomLeft,
+			},
+		})
 
 		Expect(err).To(BeNil())
 
-		fmt.Printf("Job id: %s\n", job.Id)
+		fmt.Printf("Job id: %s\n", job.ID)
 
-		_, err = job.Status()
+		_, err = job.FetchStatus()
 		Expect(err).To(BeNil())
 
 		checkFn := func() string {
-			status, err := job.Status()
+			status, err := job.FetchStatus()
 			Expect(err).To(BeNil())
 			return status
 		}
 
-		Eventually(checkFn, "5m").Should(Equal("done"))
+		Eventually(checkFn, "5m").Should(Equal(JobStatusDone))
 	})
 
 	/*
@@ -51,28 +75,32 @@ var _ = Describe("tracer", func() {
 	 *  2) To Test our API is running as expected
 	 */
 	It("tracer - Summary Gif", func() {
-		var STACKROCK_API_KEY = os.Getenv("STACKROCK_API_KEY")
-		var BUCKET = os.Getenv("BUCKET")
-		var INPUT_KEY = os.Getenv("INPUT_KEY")
-		var OUTPUT_KEY = os.Getenv("OUTPUT_KEY_SUMMARY_GIF")
-		var AWS_REGION = os.Getenv("AWS_REGION")
-		var AWS_ACCESS_KEY_ID = os.Getenv("AWS_ACCESS_KEY_ID")
-		var AWS_SECRET_ACCESS_KEY = os.Getenv("AWS_SECRET_ACCESS_KEY")
-
-		inputFile := NewS3BlobWithDefaults().Bucket(BUCKET).Key(INPUT_KEY).AWSCredentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
-		outputFile := NewS3BlobWithDefaults().Bucket(BUCKET).Key(OUTPUT_KEY).AWSCredentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
-
-		job, err := NewSummaryJobWithDefaults().ApiKey(STACKROCK_API_KEY).Type(SummaryTypeGif).From(inputFile).To(outputFile).Width(150).WatermarkFromText("stackrock.io").Execute()
+		job, err := mm.SummaryGIF(SummaryConfig{
+			InputURL:  fmt.Sprintf("s3://%s/%s", BUCKET, INPUT_KEY),
+			OutputURL: fmt.Sprintf("s3://%s/%s", BUCKET, OUTPUT_KEY),
+			// account for example or to a different bucket if you generate keys specific to bucket etc.
+			// Note: You can use a different set of creds for input and output if you want to upload to a totally different
+			InputCreds:  creds,
+			OutputCreds: creds,
+			Width:       500, // Defaults to size of input
+			Watermark: WatermarkText{
+				Text:      "My Awesome Company",
+				FontSize:  10,
+				FontColor: colors.Brown, // See docs for other color options
+				Opacity:   0.5,          // Should be between [0,1]
+				Position:  PositionBottomLeft,
+			},
+		})
 
 		Expect(err).To(BeNil())
 
-		fmt.Printf("Job id: %s\n", job.Id)
+		fmt.Printf("Job id: %s\n", job.ID)
 
-		_, err = job.Status()
+		_, err = job.FetchStatus()
 		Expect(err).To(BeNil())
 
 		checkFn := func() string {
-			status, err := job.Status()
+			status, err := job.FetchStatus()
 			Expect(err).To(BeNil())
 			return status
 		}
@@ -87,28 +115,32 @@ var _ = Describe("tracer", func() {
 	 *  2) To Test our API is running as expected
 	 */
 	It("tracer - Summary MP4", func() {
-		var STACKROCK_API_KEY = os.Getenv("STACKROCK_API_KEY")
-		var BUCKET = os.Getenv("BUCKET")
-		var INPUT_KEY = os.Getenv("INPUT_KEY")
-		var OUTPUT_KEY = os.Getenv("OUTPUT_KEY_SUMMARY_MP4")
-		var AWS_REGION = os.Getenv("AWS_REGION")
-		var AWS_ACCESS_KEY_ID = os.Getenv("AWS_ACCESS_KEY_ID")
-		var AWS_SECRET_ACCESS_KEY = os.Getenv("AWS_SECRET_ACCESS_KEY")
-
-		inputFile := NewS3BlobWithDefaults().Bucket(BUCKET).Key(INPUT_KEY).AWSCredentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
-		outputFile := NewS3BlobWithDefaults().Bucket(BUCKET).Key(OUTPUT_KEY).AWSCredentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
-
-		job, err := NewSummaryJobWithDefaults().ApiKey(STACKROCK_API_KEY).Type(SummaryTypeMp4).From(inputFile).To(outputFile).Width(150).WatermarkFromText("stackrock.io").Execute()
+		job, err := mm.SummaryMP4(SummaryConfig{
+			InputURL:  fmt.Sprintf("s3://%s/%s", BUCKET, INPUT_KEY),
+			OutputURL: fmt.Sprintf("s3://%s/%s", BUCKET, OUTPUT_KEY),
+			// account for example or to a different bucket if you generate keys specific to bucket etc.
+			// Note: You can use a different set of creds for input and output if you want to upload to a totally different
+			InputCreds:  creds,
+			OutputCreds: creds,
+			Width:       500, // Defaults to size of input
+			Watermark: WatermarkText{
+				Text:      "My Awesome Company",
+				FontSize:  10,
+				FontColor: colors.Brown, // See docs for other color options
+				Opacity:   0.5,          // Should be between [0,1]
+				Position:  PositionBottomLeft,
+			},
+		})
 
 		Expect(err).To(BeNil())
 
-		fmt.Printf("Job id: %s\n", job.Id)
+		fmt.Printf("Job id: %s\n", job.ID)
 
-		_, err = job.Status()
+		_, err = job.FetchStatus()
 		Expect(err).To(BeNil())
 
 		checkFn := func() string {
-			status, err := job.Status()
+			status, err := job.FetchStatus()
 			Expect(err).To(BeNil())
 			return status
 		}
@@ -123,34 +155,31 @@ var _ = Describe("tracer", func() {
 	 *  2) To Test our API is running as expected
 	 */
 	It("tracer - Transcode", func() {
-		var STACKROCK_API_KEY = os.Getenv("STACKROCK_API_KEY")
-		var BUCKET = os.Getenv("BUCKET")
-		var INPUT_KEY = os.Getenv("TRANSCODE_INPUT_KEY")
-		var OUTPUT_KEY = os.Getenv("OUTPUT_KEY_TRANSCODE")
-		var AWS_REGION = os.Getenv("AWS_REGION")
-		var AWS_ACCESS_KEY_ID = os.Getenv("AWS_ACCESS_KEY_ID")
-		var AWS_SECRET_ACCESS_KEY = os.Getenv("AWS_SECRET_ACCESS_KEY")
-
-		inputFile := NewS3BlobWithDefaults().Bucket(BUCKET).Key(INPUT_KEY).AWSCredentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
-		outputFile := NewS3BlobWithDefaults().Bucket(BUCKET).Key(OUTPUT_KEY).AWSCredentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION)
-
-		transcodeOpts := NewTranscodeOptsWithDefaults().Encoder(EncoderH264).BitrateKbps(BITRATE_FOUR_MEGAKBPS).Container(ContainerMP4).VideoSize(VIDEOSIZE_HD)
-
-		job, err := NewTranscodeJobWithDefaults().ApiKey(STACKROCK_API_KEY).From(inputFile).To(outputFile).Width(150).WatermarkFromText("stackrock.io").Opts(transcodeOpts).Execute()
+		job, err := mm.Transcode(TranscodeConfig{
+			InputURL:    fmt.Sprintf("s3://%s/%s", BUCKET, INPUT_KEY),
+			OutputURL:   fmt.Sprintf("s3://%s/%s", BUCKET, OUTPUT_KEY),
+			InputCreds:  creds,
+			OutputCreds: creds,
+			Width:       500, // Defaults to size of input
+			Height:      400,
+			Container:   ContainerMP4,
+			Encoder:     EncoderH264,
+			Bitrate:     Bitrate1Mbps,
+		})
 
 		Expect(err).To(BeNil())
 
-		fmt.Printf("Job id: %s\n", job.Id)
+		fmt.Printf("Job id: %s\n", job.ID)
 
-		_, err = job.Status()
+		_, err = job.FetchStatus()
 		Expect(err).To(BeNil())
 
 		checkFn := func() string {
-			status, err := job.Status()
+			status, err := job.FetchStatus()
 			Expect(err).To(BeNil())
 			return status
 		}
 
-		Eventually(checkFn, "10m").Should(Equal("done"))
+		Eventually(checkFn, "5m").Should(Equal("done"))
 	})
 })
