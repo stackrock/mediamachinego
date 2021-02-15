@@ -164,7 +164,7 @@ var _ = Describe("tracer", func() {
 			Height:      400,
 			Container:   ContainerMP4,
 			Encoder:     EncoderH264,
-			Bitrate:     Bitrate1Mbps,
+			BitrateKBPS: Bitrate1Mbps,
 		})
 
 		Expect(err).To(BeNil())

@@ -48,9 +48,9 @@ By default, the output has the same dimensions as the input video, set Width to 
 Height is automatically calculated according to input aspect ratio.
 */
 type TranscodeConfig struct {
-	Container TranscodeContainer // required
-	Encoder   TranscodeEncoder   // required
-	Bitrate   TranscodeBitrate   // required
+	Container   TranscodeContainer // required
+	Encoder     TranscodeEncoder   // required
+	BitrateKBPS TranscodeBitrate   // required
 
 	// Structured as {http|https|s3|azure|gcp}://{bucket-name}/{prefix-if-any}/{object-name}
 	// Examples: s3://bucket/prefix/input.mp4, https://example.com/files/input.mp4
