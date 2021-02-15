@@ -16,9 +16,9 @@ const (
 	apiEndpoint = "https://api.mediamachine.io"
 )
 
-// MediaMachine gives you access to the various operations you can perform using the StackRock API.
+// MediaMachine gives you access to the various operations you can perform using the API.
 type MediaMachine struct {
-	APIKey string // Your stackrock API key goes here
+	APIKey string // Your API key goes here
 }
 
 var httpClient = http.Client{Timeout: time.Second * 10}
