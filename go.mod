@@ -1,4 +1,4 @@
-module github.com/stackrock/mediamachinego
+module mediamachine
 
 go 1.14
 
