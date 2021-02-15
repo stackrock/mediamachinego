@@ -9,35 +9,35 @@ const (
 	PositionBottomRight WatermarkPosition = "bottomRight"
 )
 
-// WatermarkText can be used for a simple text watermark overlaid on the output
+// WatermarkText can be used for a simple text Watermark overlaid on the output
 type WatermarkText struct {
-	Text      string            // The text to display as the watermark
+	Text      string            // The text to display as the Watermark
 	FontSize  uint              // Optional - defaults to 10
 	FontColor string            // Optional - defaults to black
-	Opacity   float32           // Opacity of watermark between 0 and 1 inclusive
-	Position  WatermarkPosition // Where the watermark should be placed. See WatermarkPosition
+	Opacity   float32           // Opacity of Watermark between 0 and 1 inclusive
+	Position  WatermarkPosition // Where the Watermark should be placed. See WatermarkPosition
 }
 
-// WatermarkImageURL can be used to supply an image url which will be used as a watermark
+// WatermarkImageURL can be used to supply an image url which will be used as a Watermark
 type WatermarkImageURL struct {
-	URL      string            // URL where the watermark image should be fetched from (currently, bucket urls are not supported)
-	Height   uint8             // Height of the watermark
-	Width    uint8             // Width of the watermark
-	Opacity  float32           // Opacity of watermark between 0 and 1 inclusive
-	Position WatermarkPosition // Where the watermark should be placed. See WatermarkPosition
+	URL      string            // URL where the Watermark image should be fetched from (currently, bucket urls are not supported)
+	Height   uint8             // Height of the Watermark
+	Width    uint8             // Width of the Watermark
+	Opacity  float32           // Opacity of Watermark between 0 and 1 inclusive
+	Position WatermarkPosition // Where the Watermark should be placed. See WatermarkPosition
 }
 
-// WatermarkImageNamed can be used to provide a reference to a watermark image uploaded to your mediamachine account
-// You can easily upload your watermark images via account settings. The uploaded image gets a unique name that can be used here.
+// WatermarkImageNamed can be used to provide a reference to a Watermark image uploaded to your mediamachine account
+// You can easily upload your Watermark images via account settings. The uploaded image gets a unique name that can be used here.
 type WatermarkImageNamed struct {
-	ImageName string            // Name of a watermark image uploaded on the mediamachine account
-	Height    uint8             // Height of the watermark
-	Width     uint8             // Width of the watermark
-	Opacity   float32           // Opacity of watermark between 0 and 1 inclusive
-	Position  WatermarkPosition // Where the watermark should be placed. See WatermarkPosition
+	ImageName string            // Name of a Watermark image uploaded on the mediamachine account
+	Height    uint8             // Height of the Watermark
+	Width     uint8             // Width of the Watermark
+	Opacity   float32           // Opacity of Watermark between 0 and 1 inclusive
+	Position  WatermarkPosition // Where the Watermark should be placed. See WatermarkPosition
 }
 
-type watermark interface {
+type Watermark interface {
 	isWatermark()
 }
 
