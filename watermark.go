@@ -11,11 +11,11 @@ const (
 
 // WatermarkText can be used for a simple text watermark overlaid on the output
 type WatermarkText struct {
-	Text     string            // The text to display as the watermark
-	FontSize uint              // Optional - defaults to 10
-	Color    string            // Optional - defaults to black
-	Opacity  float32           // Opacity of watermark between 0 and 1 inclusive
-	Position WatermarkPosition // Where the watermark should be placed. See WatermarkPosition
+	Text      string            // The text to display as the watermark
+	FontSize  uint              // Optional - defaults to 10
+	FontColor string            // Optional - defaults to black
+	Opacity   float32           // Opacity of watermark between 0 and 1 inclusive
+	Position  WatermarkPosition // Where the watermark should be placed. See WatermarkPosition
 }
 
 // WatermarkImageURL can be used to supply an image url which will be used as a watermark

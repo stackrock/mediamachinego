@@ -15,9 +15,7 @@ import (
 )
 
 // Use your StackRock API Key to initialize the MediaMachine SDK
-const apiKey = "stackrock-web-test-test-2383a840-514b-11eb-9af5-9da5c708b869"
-
-//const apiKey = "stackrock_test_me"
+const apiKey = "my-stackrock-key"
 
 func main() {
 	mm := mediamachine.MediaMachine{APIKey: apiKey}
@@ -40,11 +38,11 @@ func main() {
 		OutputCreds: creds,
 		Width:       500, // Defaults to size of input
 		Watermark: mediamachine.WatermarkText{
-			Text:     "My Awesome Company",
-			FontSize: 10,
-			Color:    colors.Brown, // See docs for other color options
-			Opacity:  0.5,          // Should be between [0,1]
-			Position: mediamachine.PositionBottomLeft,
+			Text:      "My Awesome Company",
+			FontSize:  10,
+			FontColor: colors.Brown, // See docs for other color options
+			Opacity:   0.5,          // Should be between [0,1]
+			Position:  mediamachine.PositionBottomLeft,
 		},
 		// You can opt to get notified via webhooks here or periodically check job status depending on your preferred setup
 		SuccessURL: "https://example.com/mediamachine/jobdone",
@@ -64,11 +62,11 @@ func main() {
 		OutputURL: "https://example.com/my-awesome-video-thumbnail.jpg",
 		Width:     500, // Defaults to size of input
 		Watermark: mediamachine.WatermarkText{
-			Text:     "My Awesome Company",
-			FontSize: 10,
-			Color:    colors.Brown, // See docs for other color options
-			Opacity:  0.5,          // Should be between [0,1]
-			Position: mediamachine.PositionBottomLeft,
+			Text:      "My Awesome Company",
+			FontSize:  10,
+			FontColor: colors.Brown, // See docs for other color options
+			Opacity:   0.5,          // Should be between [0,1]
+			Position:  mediamachine.PositionBottomLeft,
 		},
 		// You can opt to get notified via webhooks here or periodically check job status depending on your preferred setup
 		SuccessURL: "https://example.com/mediamachine/jobdone",

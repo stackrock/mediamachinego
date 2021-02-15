@@ -28,24 +28,17 @@ const (
 	// EncoderVp9 is the configuration for a `vp9` encoder.
 	EncoderVp9 TranscodeEncoder = "vp9"
 
-	// BITRATE_EIGHT_MEGAKBPS is the configuration for a `8000 kbps` bitrate.
-	BITRATE_EIGHT_MEGAKBPS TranscodeBitrate = "8000"
-	// BITRATE_FOUR_MEGAKBPS is the configuration for a `4000 kbps` bitrate.
-	BITRATE_FOUR_MEGAKBPS TranscodeBitrate = "4000"
-	// BITRATE_ONE_MEGAKBPS is the configuration for a `1000 kbps` bitrate.
-	BITRATE_ONE_MEGAKBPS TranscodeBitrate = "1000"
+	// Bitrate4Mbps is the configuration for a `4000 kbps` bitrate.
+	Bitrate4Mbps TranscodeBitrate = "4000"
+	// Bitrate2Mbps is the configuration for a `2000 kbps` bitrate.
+	Bitrate2Mbps TranscodeBitrate = "2000"
+	// Bitrate1Mbps is the configuration for a `1000 kbps` bitrate.
+	Bitrate1Mbps TranscodeBitrate = "1000"
 
 	// ContainerMP4 is the configuration for a `mp4` video container.
 	ContainerMP4 TranscodeContainer = "mp4"
 	// ContainerWebm is the configuration for a `webm` video container.
 	ContainerWebm TranscodeContainer = "webm"
-
-	//// VIDEOSIZE_FULL_HD is the configuration for a `1080` video output.
-	//VIDEOSIZE_FULL_HD = "1080"
-	//// VIDEOSIZE_HD is the configuration for a `720` video output.
-	//VIDEOSIZE_HD = "720"
-	//// VIDEOSIZE_SD is the configuration for a `480` video output.
-	//VIDEOSIZE_SD = "480"
 )
 
 /* TranscodeConfig configures the request for a video summary.
@@ -90,7 +83,15 @@ func (m MediaMachine) Transcode(cfg TranscodeConfig) (Job, error) {
 		return Job{}, err
 	}
 
-	body, err := json.Marshal(cfg)
+	tr := struct {
+		APIKey string
+		TranscodeConfig
+	}{
+		APIKey:          m.APIKey,
+		TranscodeConfig: cfg,
+	}
+
+	body, err := json.Marshal(tr)
 	if err != nil {
 		return Job{}, err
 	}
