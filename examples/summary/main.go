@@ -8,16 +8,14 @@ to your requirements.
 package main
 
 import (
-	mediamachine "github.com/stackrock/mediamachinego"
 	"github.com/stackrock/mediamachinego/colors"
+	"github.com/stackrock/mediamachinego/mediamachine"
 	"log"
 	"time"
 )
 
 // Use your StackRock API Key to initialize the MediaMachine SDK
-const apiKey = "stackrock-web-test-ad85cef0-3414-11eb-80ae-415459e1a243"
-
-//const apiKey = "stackrock_test_me"
+const apiKey = "my-stackrock-key"
 
 func main() {
 	mm := mediamachine.MediaMachine{APIKey: apiKey}
@@ -34,8 +32,7 @@ func main() {
 	// If your video assets are served via a file server, you can directly use their urls. You can also mix-and-match
 	// using file server urls and bucket stores.
 	// See Thumbnail example for working with videos served via a file server.
-	s3GIFSummaryJob, err := mm.Summary(mediamachine.SummaryConfig{
-		Type:      mediamachine.SummaryTypeGif,
+	s3GIFSummaryJob, err := mm.SummaryGIF(mediamachine.SummaryConfig{
 		InputURL:  "s3://example-bucket/my-awesome-video.mp4",
 		OutputURL: "s3://example-bucket/my-awesome-video-summary.jpg",
 		// account for example or to a different bucket if you generate keys specific to bucket etc.
@@ -45,7 +42,7 @@ func main() {
 		Watermark: mediamachine.WatermarkText{ // Optional
 			Text:     "My Awesome Company",
 			FontSize: 10,
-			Color:    colors.Brown, // See docs for other color options
+			FontColor:    colors.Brown, // See docs for other color options
 			Opacity:  0.5,          // Should be between [0,1]
 			Position: mediamachine.PositionBottomLeft,
 		},

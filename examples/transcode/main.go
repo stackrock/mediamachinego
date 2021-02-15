@@ -8,15 +8,13 @@ to your requirements.
 package main
 
 import (
-	mediamachine "github.com/stackrock/mediamachinego"
+	"github.com/stackrock/mediamachinego/mediamachine"
 	"log"
 	"time"
 )
 
 // Use your StackRock API Key to initialize the MediaMachine SDK
-const apiKey = "stackrock-web-test-ad85cef0-3414-11eb-80ae-415459e1a243"
-
-//const apiKey = "stackrock_test_me"
+const apiKey = "my-stackrock-key"
 
 func main() {
 	mm := mediamachine.MediaMachine{APIKey: apiKey}
