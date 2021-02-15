@@ -60,7 +60,7 @@ def pipeline(kind):
                 	"apk add gcc musl-dev",
                     "go get github.com/onsi/ginkgo/ginkgo",
                     "go get github.com/onsi/gomega/...",
-                    'ginkgo -p -focus "tracer"'
+                    'ginkgo -p -focus "tracer" mediamachine/'
                 ]
             },
             {
