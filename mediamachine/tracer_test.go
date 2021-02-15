@@ -4,8 +4,8 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/stackrock/mediamachinego"
 	"github.com/stackrock/mediamachinego/colors"
+	"github.com/stackrock/mediamachinego/mediamachine"
 	"os"
 )
 
@@ -16,7 +16,7 @@ var OUTPUT_KEY = os.Getenv("OUTPUT_KEY_SUMMARY_GIF")
 var AWS_REGION = os.Getenv("AWS_REGION")
 var AWS_ACCESS_KEY_ID = os.Getenv("AWS_ACCESS_KEY_ID")
 var AWS_SECRET_ACCESS_KEY = os.Getenv("AWS_SECRET_ACCESS_KEY")
-var mm = MediaMachine{APIKey: STACKROCK_API_KEY}
+var mm = mediamachine.MediaMachine{APIKey: STACKROCK_API_KEY}
 
 var _ = Describe("tracer", func() {
 	// Using S3: input video from s3, output uploaded to s3
@@ -35,7 +35,7 @@ var _ = Describe("tracer", func() {
 	 *  2) To Test our API is running as expected
 	 */
 	It("tracer - thumbnail-s3-compatible-store", func() {
-		job, err := mm.Thumbnail(ThumbnailConfig{
+		job, err := mm.Thumbnail(mediamachine.ThumbnailConfig{
 			InputURL:  fmt.Sprintf("s3://%s/%s", BUCKET, INPUT_KEY),
 			OutputURL: fmt.Sprintf("s3://%s/%s", BUCKET, OUTPUT_KEY),
 			// account for example or to a different bucket if you generate keys specific to bucket etc.
@@ -43,12 +43,12 @@ var _ = Describe("tracer", func() {
 			InputCreds:  creds,
 			OutputCreds: creds,
 			Width:       500, // Defaults to size of input
-			Watermark: WatermarkText{
+			Watermark: mediamachine.WatermarkText{
 				Text:      "My Awesome Company",
 				FontSize:  10,
 				FontColor: colors.Brown, // See docs for other color options
 				Opacity:   0.5,          // Should be between [0,1]
-				Position:  PositionBottomLeft,
+				Position:  mediamachine.PositionBottomLeft,
 			},
 		})
 
@@ -65,7 +65,7 @@ var _ = Describe("tracer", func() {
 			return status
 		}
 
-		Eventually(checkFn, "5m").Should(Equal(JobStatusDone))
+		Eventually(checkFn, "5m").Should(Equal(mediamachine.JobStatusDone))
 	})
 
 	/*
@@ -75,7 +75,7 @@ var _ = Describe("tracer", func() {
 	 *  2) To Test our API is running as expected
 	 */
 	It("tracer - Summary Gif", func() {
-		job, err := mm.SummaryGIF(SummaryConfig{
+		job, err := mm.SummaryGIF(mediamachine.SummaryConfig{
 			InputURL:  fmt.Sprintf("s3://%s/%s", BUCKET, INPUT_KEY),
 			OutputURL: fmt.Sprintf("s3://%s/%s", BUCKET, OUTPUT_KEY),
 			// account for example or to a different bucket if you generate keys specific to bucket etc.
@@ -83,12 +83,12 @@ var _ = Describe("tracer", func() {
 			InputCreds:  creds,
 			OutputCreds: creds,
 			Width:       500, // Defaults to size of input
-			Watermark: WatermarkText{
+			Watermark: mediamachine.WatermarkText{
 				Text:      "My Awesome Company",
 				FontSize:  10,
 				FontColor: colors.Brown, // See docs for other color options
 				Opacity:   0.5,          // Should be between [0,1]
-				Position:  PositionBottomLeft,
+				Position:  mediamachine.PositionBottomLeft,
 			},
 		})
 
@@ -115,7 +115,7 @@ var _ = Describe("tracer", func() {
 	 *  2) To Test our API is running as expected
 	 */
 	It("tracer - Summary MP4", func() {
-		job, err := mm.SummaryMP4(SummaryConfig{
+		job, err := mm.SummaryMP4(mediamachine.SummaryConfig{
 			InputURL:  fmt.Sprintf("s3://%s/%s", BUCKET, INPUT_KEY),
 			OutputURL: fmt.Sprintf("s3://%s/%s", BUCKET, OUTPUT_KEY),
 			// account for example or to a different bucket if you generate keys specific to bucket etc.
@@ -123,12 +123,12 @@ var _ = Describe("tracer", func() {
 			InputCreds:  creds,
 			OutputCreds: creds,
 			Width:       500, // Defaults to size of input
-			Watermark: WatermarkText{
+			Watermark: mediamachine.WatermarkText{
 				Text:      "My Awesome Company",
 				FontSize:  10,
 				FontColor: colors.Brown, // See docs for other color options
 				Opacity:   0.5,          // Should be between [0,1]
-				Position:  PositionBottomLeft,
+				Position:  mediamachine.PositionBottomLeft,
 			},
 		})
 
@@ -155,16 +155,16 @@ var _ = Describe("tracer", func() {
 	 *  2) To Test our API is running as expected
 	 */
 	It("tracer - Transcode", func() {
-		job, err := mm.Transcode(TranscodeConfig{
+		job, err := mm.Transcode(mediamachine.TranscodeConfig{
 			InputURL:    fmt.Sprintf("s3://%s/%s", BUCKET, INPUT_KEY),
 			OutputURL:   fmt.Sprintf("s3://%s/%s", BUCKET, OUTPUT_KEY),
 			InputCreds:  creds,
 			OutputCreds: creds,
 			Width:       500, // Defaults to size of input
 			Height:      400,
-			Container:   ContainerMP4,
-			Encoder:     EncoderH264,
-			BitrateKBPS: Bitrate1Mbps,
+			Container:   mediamachine.ContainerMP4,
+			Encoder:     mediamachine.EncoderH264,
+			BitrateKBPS: mediamachine.Bitrate1Mbps,
 		})
 
 		Expect(err).To(BeNil())
