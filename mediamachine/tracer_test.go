@@ -11,14 +11,14 @@ import (
 	"github.com/stackrock/mediamachinego/mediamachine"
 )
 
-var STACKROCK_API_KEY = os.Getenv("STACKROCK_API_KEY")
+var MEDIAMACHINE_API_KEY = os.Getenv("MEDIAMACHINE_API_KEY")
 var BUCKET = os.Getenv("BUCKET")
 var INPUT_KEY = os.Getenv("INPUT_KEY")
 var OUTPUT_KEY = os.Getenv("OUTPUT_KEY_SUMMARY_GIF")
 var AWS_REGION = os.Getenv("AWS_REGION")
 var AWS_ACCESS_KEY_ID = os.Getenv("AWS_ACCESS_KEY_ID")
 var AWS_SECRET_ACCESS_KEY = os.Getenv("AWS_SECRET_ACCESS_KEY")
-var mm = mediamachine.MediaMachine{APIKey: STACKROCK_API_KEY}
+var mm = mediamachine.MediaMachine{APIKey: MEDIAMACHINE_API_KEY}
 
 var _ = Describe("tracer", func() {
 	// Using S3: input video from s3, output uploaded to s3
@@ -32,7 +32,7 @@ var _ = Describe("tracer", func() {
 
 	/*
 	 * Tracer Bullet for a thumbnail-s3-compatible-store job.
-	 * We use this job internally at StackRock for two reasons:
+	 * We use this job internally at MediaMachine for two reasons:
 	 *  1) To keep the SDK in sync with API
 	 *  2) To Test our API is running as expected
 	 */
@@ -72,7 +72,7 @@ var _ = Describe("tracer", func() {
 
 	/*
 	 * Tracer Bullet for a Summary Gif job.
-	 * We use this job internally at StackRock for two reasons:
+	 * We use this job internally at MediaMachine for two reasons:
 	 *  1) To keep the SDK in sync with API
 	 *  2) To Test our API is running as expected
 	 */
@@ -112,7 +112,7 @@ var _ = Describe("tracer", func() {
 
 	/*
 	 * Tracer Bullet for a Summary MP4 job.
-	 * We use this job internally at StackRock for two reasons:
+	 * We use this job internally at MediaMachine for two reasons:
 	 *  1) To keep the SDK in sync with API
 	 *  2) To Test our API is running as expected
 	 */
@@ -152,7 +152,7 @@ var _ = Describe("tracer", func() {
 
 	/*
 	 * Tracer Bullet for a Transcode job.
-	 * We use this job internally at StackRock for two reasons:
+	 * We use this job internally at MediaMachine for two reasons:
 	 *  1) To keep the SDK in sync with API
 	 *  2) To Test our API is running as expected
 	 */

@@ -16,7 +16,7 @@ const (
 /* Job is a handle for a job submitted to the MediaMachine API
 
 The Job ID can be stored and re-used by the caller to fetch status later.
-Jobs are asynchronously processed by the StackRock API.
+Jobs are asynchronously processed by the MediaMachine API.
 */
 type Job struct {
 	ID        string // Unique Job ID
