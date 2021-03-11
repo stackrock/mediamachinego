@@ -1,11 +1,16 @@
 package mediamachine
 
+// WatermarkPosition are references to named, pre-defined watermark locations
 type WatermarkPosition = string
 
 const (
-	PositionTopLeft     WatermarkPosition = "topLeft"
-	PositionTopRight    WatermarkPosition = "topRight"
-	PositionBottomLeft  WatermarkPosition = "bottomLeft"
+	// PositionTopLeft places a watermark in the top left corner of the output
+	PositionTopLeft WatermarkPosition = "topLeft"
+	// PositionTopRight places a watermark in the top right corner of the output
+	PositionTopRight WatermarkPosition = "topRight"
+	// PositionBottomLeft places a watermark in the bottom left corner of the output
+	PositionBottomLeft WatermarkPosition = "bottomLeft"
+	// PositionBottomRight places a watermark in the bottom right corner of the output
 	PositionBottomRight WatermarkPosition = "bottomRight"
 )
 
@@ -37,6 +42,7 @@ type WatermarkImageNamed struct {
 	Position  WatermarkPosition // Where the Watermark should be placed. See WatermarkPosition
 }
 
+// Watermark can be of multiple types - text watermark, image or a saved image reference watermark
 type Watermark interface {
 	isWatermark()
 }

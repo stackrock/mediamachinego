@@ -41,11 +41,13 @@ const (
 	ContainerWebm TranscodeContainer = "webm"
 )
 
-/* TranscodeConfig configures the request for a video summary.
+/*
+TranscodeConfig configures the request for a video transcode operation.
 The input video location can be specified via the FromUrl or the From method.
 
-By default, the output has the same dimensions as the input video, set Width to desired value to customize.
-Height is automatically calculated according to input aspect ratio.
+By default, the output has the same dimensions as the input video.
+Set Width to desired value to customize.
+Height can also be specified, however it is automatically calculated according to input aspect ratio if not specified.
 */
 type TranscodeConfig struct {
 	Container   TranscodeContainer // required

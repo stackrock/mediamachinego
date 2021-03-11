@@ -1,5 +1,5 @@
 /*
-Watermark color field can be set to these handy color string names.
+Package colors provides a handy reference to names colors for the Watermark color field.
 
 Watermark colors can also be a [0x|#]RRGGBB[AA] sequence, possibly followed by @ and a string representing the alpha component.
 The alpha component may be a string composed by "0x" followed by an hexadecimal number or

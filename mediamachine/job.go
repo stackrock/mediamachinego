@@ -8,12 +8,16 @@ import (
 )
 
 const (
+	// JobStatusQueued - returned by the MediaMachine API when the job is accepted and enqueued for processing
 	JobStatusQueued  = "queued"
+	// JobStatusErrored - returned by the MediaMachine API if the job errored during async processing
 	JobStatusErrored = "errored"
+	// JobStatusDone - returned by the MediaMachine API when the job is completely processed
 	JobStatusDone    = "done"
 )
 
-/* Job is a handle for a job submitted to the MediaMachine API
+/*
+Job is a handle for a job submitted to the MediaMachine API
 
 The Job ID can be stored and re-used by the caller to fetch status later.
 Jobs are asynchronously processed by the MediaMachine API.

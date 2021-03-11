@@ -11,13 +11,14 @@ import (
 type SummaryType = string
 
 const (
-	// Represents an output of type `gif`.
+	// SummaryTypeGif - represents an output of type `gif`
 	SummaryTypeGif SummaryType = "gif"
-	// Represents an output of type `mp4`.
+	// SummaryTypeMp4 - represents an output of type `mp4`
 	SummaryTypeMp4 SummaryType = "mp4"
 )
 
-/* SummaryConfig configures the request for a video summary.
+/*
+SummaryConfig configures the request for a video summary.
 The input video location can be specified via the FromUrl or the From method.
 
 By default, the output has the same dimensions as the input video, set Width to desired value to customize.
@@ -47,9 +48,10 @@ type SummaryConfig struct {
 }
 
 /*
-Summary enqueues a request to the MediaMachine backend to asynchronously generate a summary uploaded to an s3-compatible-store for the input video.
+SummaryGIF enqueues a request to the MediaMachine backend to asynchronously generate a summary
+uploaded to an s3-compatible-store for the input video.
 
-The output image is uploaded to the location specified in the SummaryConfig.
+The output is a GIF and is uploaded to the location specified in the SummaryConfig.
 Errors if the input configuration is invalid.
 */
 func (m MediaMachine) SummaryGIF(cfg SummaryConfig) (Job, error) {
@@ -57,9 +59,10 @@ func (m MediaMachine) SummaryGIF(cfg SummaryConfig) (Job, error) {
 }
 
 /*
-Summary enqueues a request to the MediaMachine backend to asynchronously generate a summary uploaded to an s3-compatible-store for the input video.
+SummaryMP4 enqueues a request to the MediaMachine backend to asynchronously generate a summary
+uploaded to an s3-compatible-store for the input video.
 
-The output image is uploaded to the location specified in the SummaryConfig.
+The output summary video is packaged as an mp4 and is uploaded to the location specified in the SummaryConfig.
 Errors if the input configuration is invalid.
 */
 func (m MediaMachine) SummaryMP4(cfg SummaryConfig) (Job, error) {

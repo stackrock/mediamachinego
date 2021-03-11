@@ -5,7 +5,8 @@ import (
 	"encoding/json"
 )
 
-/* ThumbnailConfig configures the request for intelligent thumbnail-s3-compatible-store generation for the input video
+/*
+ThumbnailConfig configures the request for intelligent thumbnail-s3-compatible-store generation for the input video
 
 The input video location can be specified via the FromUrl or the From method.
 By default, the thumbnail-s3-compatible-store has the same dimensions as the input video, set the Width field to desired value to customize.

@@ -2,10 +2,14 @@ package mediamachine
 
 import "encoding/json"
 
+// Creds can be of multiple type based on the data store - aws, gcp, azure etc
 type Creds interface {
 	isCreds()
 }
 
+// CredsNamed - a reference to creds stored on the MediaMachine.io account
+// Users can store creds on the MediaMachine.io account and use reference name instead of supplying the full
+// credentials object with every request.
 type CredsNamed string
 
 // CredsAWS - re-usable aws credentials that can be attached to a BlobStore

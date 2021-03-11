@@ -2,6 +2,9 @@
 
 Go Mediamachine SDK for [MediaMachine](https://www.mediamachine.io)
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/stackrock/mediamachinego.svg)](https://pkg.go.dev/github.com/stackrock/mediamachinego)
+[![Go Report Card](https://goreportcard.com/badge/github.com/stackrock/mediamachinego)](https://goreportcard.com/report/github.com/stackrock/mediamachinego)
+
 #### Mediamachine APIs provide an easy way to create intelligent video Thumbnails and Summaries, as well as for common video transcode tasks.
 
 You can use this SDK for:
