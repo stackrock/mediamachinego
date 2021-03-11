@@ -64,3 +64,4 @@ Our general guidance is:
 - Check the issues/PR list to see if someone might have already answered your concern
 - If you want to suggest changes, feel free to open an issue first and give details about the errors you might be seeing or suggested improvements
 - If you're opening issues/PRs please try to give as much detailed information as possible so that we can help you right away
+
