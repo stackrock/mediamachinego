@@ -22,7 +22,7 @@ func main() {
 
 	// Using S3: input video from s3, output uploaded to s3
 	// It is a good security practice to make narrow scoped AWS access keys
-	// that only restrict access to a specific bucket (or even specific prefixes and objects if needed).
+	// that restrict access to a specific bucket (or even specific prefixes and objects if needed).
 	creds := mediamachine.CredsAWS{
 		AccessKeyID:     "my-aws-access-key-id",
 		SecretAccessKey: "my-aws-secret-access-key",
@@ -32,8 +32,8 @@ func main() {
 	s3Job, err := mm.Thumbnail(mediamachine.ThumbnailConfig{
 		InputURL:  "s3://example-bucket/my-awesome-video.mp4",
 		OutputURL: "s3://example-bucket/my-awesome-video-thumbnail.jpg",
-		// account for example or to a different bucket if you generate keys specific to bucket etc.
 		// Note: You can use a different set of creds for input and output if you want to upload to a totally different
+		// account for example or to a different bucket etc.
 		InputCreds:  creds,
 		OutputCreds: creds,
 		Width:       500, // Defaults to size of input
@@ -80,7 +80,8 @@ func main() {
 
 	// Example function for waiting for job completion
 	waitForJob := func(job mediamachine.Job, done chan struct{}) {
-		for range time.NewTicker(time.Second * 60).C {
+		log.Printf("waiting for job (%s) to finish...", job.ID)
+		for range time.NewTicker(time.Second * 10).C {
 			status, err := job.FetchStatus()
 			if err != nil {
 				log.Printf("failed to fetch status for job: %s", job.ID)

@@ -21,7 +21,7 @@ func main() {
 
 	// Using S3: input video from s3, output uploaded to s3
 	// It is a good security practice to make narrow scoped AWS access keys
-	// that only restrict access to a specific bucket (or even specific prefixes and objects if needed).
+	// that restrict access to a specific bucket (or even specific prefixes and objects if needed).
 	creds := mediamachine.CredsAWS{
 		AccessKeyID:     "my-aws-access-key-id",
 		SecretAccessKey: "my-aws-secret-access-key",
@@ -31,17 +31,17 @@ func main() {
 	// If your video assets are served via a file server, you can directly use their urls. You can also mix-and-match
 	// using file server urls and bucket stores.
 	// See Thumbnail example for working with videos served via a file server.
-	s3GIFTranscodeJob, err := mm.Transcode(mediamachine.TranscodeConfig{
+	s3TranscodeJob, err := mm.Transcode(mediamachine.TranscodeConfig{
 		InputURL:  "s3://example-bucket/my-awesome-video.mp4",
-		OutputURL: "s3://example-bucket/my-awesome-video-transcode.jpg",
-		// account for example or to a different bucket if you generate keys specific to bucket etc.
+		OutputURL: "s3://example-bucket/my-awesome-video-transcode.wemb",
 		// Note: You can use a different set of creds for input and output if you want to upload to a totally different
+		// account for example or to a different bucket etc.
 		InputCreds:  creds,
 		OutputCreds: creds,
 
 		// Make sure the encoder and container are compatible with each other.
-		Container: mediamachine.ContainerMP4,
-		Encoder:   mediamachine.EncoderH264,
+		Container: mediamachine.ContainerWebm,
+		Encoder:   mediamachine.EncoderVp8,
 
 		// You can opt to get notified via webhooks here or periodically check job status depending on your preferred setup
 		SuccessURL: "https://example.com/mediamachine/jobdone",
@@ -76,7 +76,7 @@ func main() {
 	}
 
 	jobsDone := make(chan struct{})
-	go waitForJob(s3GIFTranscodeJob, jobsDone)
+	go waitForJob(s3TranscodeJob, jobsDone)
 
 	// Wait for job to finish
 	<-jobsDone
